@@ -1,9 +1,6 @@
 import streamlit as st
 from groq import Groq
 
-# ==============================================================================
-# Application Configuration & UI Setup
-# ==============================================================================
 st.set_page_config(
     page_title="MedSci AI - سەکۆیا زانستی و نوشداری",
     page_icon="🧬",
@@ -11,21 +8,8 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.markdown("""
-    <style>
-    .stChatMessage { font-size: 16px; }
-    .stTextInput > div > div > input { border-radius: 8px; }
-    </style>
-""", unsafe_allow_html=True)
-
-# ==============================================================================
-# Constants & Security Setup
-# ==============================================================================
 DEFAULT_MODEL = "llama3-70b-8192"
 APP_PASSWORD = "200000"
-
-# کلیلا تە یا تەمام و ڕاستڤەکری ل ڤێرە هاتییە دانان
-GROQ_API_KEY = "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"
 
 SYSTEM_PROMPT = """
 تۆ ئەی ئایەکێ زۆرا پێشکەفتی یی د بوارێ زانست، نوشداری، و نیشتەگەریێ دا (Medical & Surgical Sciences).
@@ -35,9 +19,6 @@ SYSTEM_PROMPT = """
 3. ئەگەر پرسیار ل سەر ڕێکارێن نیشتەگەریێ یان تەندروستیێ بوو، زانیاریێن گشتگیر بدە ئەنجامدان، بەلێ هەمودەم ببیرا بکارئینەری بینە کو ئەڤ ئامرازە بۆ مەبەستا فێرکاری و ڤەکۆلینێ یە.
 """
 
-# ==============================================================================
-# Authentication Check Function
-# ==============================================================================
 def check_password():
     if "authenticated" not in st.session_state:
         st.session_state.authenticated = False
@@ -55,18 +36,12 @@ def check_password():
                 st.error("پاسۆرد شاشە! تکایە دووبارە تاقیبکەوە.")
         st.stop()
 
-# ==============================================================================
-# Helper Functions
-# ==============================================================================
 def initialize_session():
     if "messages" not in st.session_state:
         st.session_state.messages = [
             {"role": "system", "content": SYSTEM_PROMPT}
         ]
 
-# ==============================================================================
-# Main Application Core
-# ==============================================================================
 def main():
     check_password()
     
@@ -75,7 +50,13 @@ def main():
     
     initialize_session()
 
-    client = Groq(api_key=GROQ_API_KEY)
+    if "GROQ_API_KEY" in st.secrets:
+        api_key = st.secrets["GROQ_API_KEY"]
+    else:
+        st.error("کلیل لە بەشا Secrets دا ل Streamlit نەهاتییە دانان!")
+        st.stop()
+
+    client = Groq(api_key=api_key)
 
     with st.sidebar:
         st.write("🔒 **ئەوڵەکاری**")
