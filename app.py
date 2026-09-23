@@ -1,5 +1,5 @@
 import streamlit as st
-from openai import OpenAI
+from groq import Groq
 
 # ==============================================================================
 # Application Configuration & UI Setup
@@ -11,7 +11,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for UI polish
 st.markdown("""
     <style>
     .stChatMessage { font-size: 16px; }
@@ -22,22 +21,24 @@ st.markdown("""
 # ==============================================================================
 # Constants & Security Setup
 # ==============================================================================
-DEFAULT_MODEL = "gpt-4o"
+DEFAULT_MODEL = "llama3-70b-8192"
 APP_PASSWORD = "200000"
+
+# کلیلا نوو ڕاستەوخۆ ل ڤێرە هاتییە دانان
+GROQ_API_KEY = "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"
 
 SYSTEM_PROMPT = """
 تۆ ئەی ئایەکێ زۆرا پێشکەفتی یی د بوارێ زانست، نوشداری، و نیشتەگەریێ دا (Medical & Surgical Sciences).
 ئەرکێ تە ئەڤەیە:
 1. بەرسڤێن تە ب هووربینیەکا زانستی یا بڵند بن د بوارێن ئاناتۆمی، فارماکۆلۆجی، جڕاحی، و زانستێن گشتی دا.
-2. تەنی ب شێوازەکێ ڕوون و ئەکادیمی بەرسڤا پرسیاران بدە.
-3. ئەگەر پرسیار ل سەر ڕێکارێن نیشتەگەریێ یان تەندروستیێ بوو، زانیاریێن گشتگیر ب دە ئەنجامدان، بەلێ هەمودەم ببیرا بکارئینەری بینە کو ئەڤ ئامرازە بوو مەبەستا فێرکاری و ڤەکۆلینێ یە.
+2. تەنێ ب شێوازەکێ ڕوون و ئەکادیمی بەرسڤا پرسیاران بدە.
+3. ئەگەر پرسیار ل سەر ڕێکارێن نیشتەگەریێ یان تەندروستیێ بوو، زانیاریێن گشتگیر بدە ئەنجامدان، بەلێ هەمودەم ببیرا بکارئینەری بینە کو ئەڤ ئامرازە بۆ مەبەستا فێرکاری و ڤەکۆلینێ یە.
 """
 
 # ==============================================================================
 # Authentication Check Function
 # ==============================================================================
 def check_password():
-    """Returns True if the user enters the correct password."""
     if "authenticated" not in st.session_state:
         st.session_state.authenticated = False
 
@@ -58,7 +59,6 @@ def check_password():
 # Helper Functions
 # ==============================================================================
 def initialize_session():
-    """Initializes chat history in Streamlit session state."""
     if "messages" not in st.session_state:
         st.session_state.messages = [
             {"role": "system", "content": SYSTEM_PROMPT}
@@ -68,38 +68,27 @@ def initialize_session():
 # Main Application Core
 # ==============================================================================
 def main():
-    # Verify password before loading main features
     check_password()
     
     st.title("🧬 MedSci AI Agent")
-    st.caption("سیستەمێ زیرەکیا دەستکرد بوو ڤەکۆلینێن زانستی و نوشداری")
+    st.caption("سیستەمێ زیرەکیا دەستکرد بۆ ڤەکۆلینێن زانستی و نوشداری")
     
     initialize_session()
 
-    # Read API Key safely from Secrets
-    if "OPENAI_API_KEY" in st.secrets:
-        api_key = st.secrets["OPENAI_API_KEY"]
-    else:
-        st.error("کلیل د بەشا Secrets دا ل Streamlit نەهاتییە دانان!")
-        st.stop()
+    client = Groq(api_key=GROQ_API_KEY)
 
-    client = OpenAI(api_key=api_key)
-
-    # Logout button in sidebar
     with st.sidebar:
         st.write("🔒 **ئەوڵەکاری**")
         if st.button("دەركەفتن (Logout)"):
             st.session_state.authenticated = False
             st.rerun()
 
-    # Display chat history
     for msg in st.session_state.messages:
         if msg["role"] != "system":
             with st.chat_message(msg["role"]):
                 st.write(msg["content"])
 
-    # User input
-    if user_query := st.chat_input("پرسیارا خو بکە..."):
+    if user_query := st.chat_input("پرسیارا خۆ یا زانستی یان نوشداری بنڤێسە..."):
         st.session_state.messages.append({"role": "user", "content": user_query})
         with st.chat_message("user"):
             st.write(user_query)
