@@ -8,8 +8,8 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# مۆدێلا نوو و کارا یا Groq
-DEFAULT_MODEL = "llama-3.1-8b-instant" 
+# مۆدێلا نوو و فەرمی یا ئێستا ل Groq
+DEFAULT_MODEL = "llama-3.1-70b-versatile" 
 APP_PASSWORD = "200000"
 
 SYSTEM_PROMPT = """
