@@ -8,8 +8,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# مۆدێلا نوو و فەرمی یا ئێستا ل Groq
-DEFAULT_MODEL = "llama-3.1-70b-versatile" 
 APP_PASSWORD = "200000"
 
 SYSTEM_PROMPT = """
@@ -59,8 +57,23 @@ def main():
 
     client = Groq(api_key=api_key)
 
+    # هەلبژاردنا مۆدێلا کارا ب شێوەیەکێ خۆکار
+    selected_model = "llama-3.3-70b-versatile"
+    try:
+        models = client.models.list()
+        model_ids = [m.id for m in models.data]
+        if "llama-3.3-70b-versatile" in model_ids:
+            selected_model = "llama-3.3-70b-versatile"
+        elif "llama-3.1-8b-instant" in model_ids:
+            selected_model = "llama-3.1-8b-instant"
+        elif len(model_ids) > 0:
+            selected_model = model_ids[0]
+    except:
+        pass
+
     with st.sidebar:
         st.write("🔒 **ئەوڵەکاری**")
+        st.info(f"مۆدێلا کارا: {selected_model}")
         if st.button("دەركەفتن (Logout)"):
             st.session_state.authenticated = False
             st.rerun()
@@ -79,7 +92,7 @@ def main():
             with st.spinner("د شیکارکرنا زانیاریێن زانستی دا..."):
                 try:
                     response = client.chat.completions.create(
-                        model=DEFAULT_MODEL,
+                        model=selected_model,
                         messages=st.session_state.messages,
                         temperature=0.3
                     )
