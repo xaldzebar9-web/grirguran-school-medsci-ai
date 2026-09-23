@@ -11,7 +11,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# جوانکاری و ڕێکخستنا دیزاینێ چاتی
 st.markdown("""
     <style>
     .stChatMessage {
@@ -27,14 +26,11 @@ st.markdown("""
 
 APP_PASSWORD = "200000"
 
-# پەیاما هاندەر ب تمامەتی ب بەهدینییەکا شیرین، پاقژ و برایەتی
+# پەیاما هاندەر یا توند داکو ب چ ڕەنگان ب عەرەبی یان سۆرانی نەتەڤەگەرێت
 SYSTEM_PROMPT = """
-تۆ هەڤالەکێ نزیک و ئەی ئایەکێ زیرەک یی د بوارێ زانست و نوشداری دا. 
-مەرجێن سەرەکی و نەگۆڕ بۆ بەرسڤێن تە:
-1. هەمیشە تنێ ب زمانێ کوردی یێ بەهدینی یێ ڕەسەن، پاقژ، شیرین و سادە ئاخڤە. چ دەمێ سۆرانی، عەرەبی یان زمانێن دی بکار نەئینە.
-2. شێوازێ ئاخڤتنا تە وەکێ برا و هەڤالەکی بێ؛ دوور بە ژ پێشەکیێن درێژ، گرێدایی یان ئەکادیمیێن توند. ڕاستەوخۆ بچە سەر مەرەمێ و بەرسڤا بکارئینەری بدە.
-3. بەرسڤێن تە باوەرپێکری، ڕوون، ب کورتی و ب شێوازەکێ چاتی یێ نەرم و جوان بن.
-4. ئەگەر پرسیار لە سەر تشتێن تەندروستی یان نوژداری بوو، زانیاریێن پێدڤی بدە، لێ بێخە بیرا بکارئینەری کو ئەڤە تنێ بۆ زانین و ڤەکۆلینێ یە.
+تۆ هەڤالەکێ نزیک و ئەی ئایەکێ زیرەک یی. ئەرکێ تە ئەوە کو تنێ و تنێ ب زمانێ کوردی یێ بەهدینی یێ ڕەسەن، پاقژ و شیرین ئاخڤی.
+ئاگاداربە: چ دەمان ب زمانێ عەرەبی، سۆرانی یان چ زمانێن دی بەرسڤ نەدە. ئەگەر تە کوردی نەفامند، دیسان ب بەهدینی بەحس بکە و بێژە «برا گیان، دوبارە پرسیارا خۆ بکە».
+شێوازێ تە یێ ئاخڤتنێ برایەتی، سادە، ڕوون و بێ پێشەکیێن درێژ بیت.
 """
 
 def check_password():
@@ -76,18 +72,8 @@ def main():
 
     client = Groq(api_key=api_key)
 
-    selected_model = "llama-3.3-70b-versatile"
-    try:
-        models = client.models.list()
-        model_ids = [m.id for m in models.data]
-        if "llama-3.3-70b-versatile" in model_ids:
-            selected_model = "llama-3.3-70b-versatile"
-        elif "llama-3.1-8b-instant" in model_ids:
-            selected_model = "llama-3.1-8b-instant"
-        elif len(model_ids) > 0:
-            selected_model = model_ids[0]
-    except:
-        pass
+    # مۆدێلا کو کوردییێ باشتر تێگەهت
+    selected_model = "llama-3.1-70b-versatile"
 
     with st.sidebar:
         st.write("🔒 **ئەوڵەکاری**")
@@ -97,7 +83,6 @@ def main():
 
     for msg in st.session_state.messages:
         if msg["role"] != "system":
-            # ل ڤێرە ل شینا ڕۆبۆتێ کەڤن، مە ئاڤاتارێ ستێرەکا ڕەنگین (یا بوویە نیشانا لۆگۆیێ تە) دانا
             avatar_icon = "⭐" if msg["role"] == "assistant" else "👤"
             with st.chat_message(msg["role"], avatar=avatar_icon):
                 st.write(msg["content"])
@@ -113,7 +98,7 @@ def main():
                     response = client.chat.completions.create(
                         model=selected_model,
                         messages=st.session_state.messages,
-                        temperature=0.3
+                        temperature=0.2
                     )
                     bot_reply = response.choices[0].message.content
                     st.write(bot_reply)
