@@ -11,6 +11,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# جوانکاری و ڕێکخستنا دیزاینێ چاتی دا وەکچەوا چاتا مە لێ بێت
 st.markdown("""
     <style>
     .stChatMessage {
@@ -26,11 +27,14 @@ st.markdown("""
 
 APP_PASSWORD = "200000"
 
-# پەیاما هاندەر یا زۆر توند داکو تنێ و تنێ ب بەهدینی بەرسڤێ بدەت و ب عەرەبی نەڤەگەرێت
+# شێوازێ ئاخڤتنێ (System Prompt) ب بەهدینییەکا پاقژ، نەرم و برایەتی
 SYSTEM_PROMPT = """
-تۆ هەڤالەکێ نزیک و ئەی ئایەکێ زیرەک یی. ئەرکێ تە ئەوە کو تنێ و تنێ ب زمانێ کوردی یێ بەهدینی یێ ڕەسەن، پاقژ و شیرین ئاخڤی.
-ئاگاداربە: چ دەمان ب زمانێ عەرەبی، سۆرانی یان چ زمانێن دی بەرسڤ نەدە. ئەگەر تە تشتەک نەفامند، ب بەهدینی بەحس بکە و بێژە «برا گیان، دوبارە پرسیارا خۆ بکە».
-شێوازێ تە یێ ئاخڤتنێ برایەتی، سادە، ڕوون و بێ پێشەکیێن درێژ بیت.
+تۆ هەڤالەکێ نزیک و ئەی ئایەکێ زیرەک یی د بوارێ زانست و نوشداری دا. 
+مەرجێن سەرەکی بۆ بەرسڤێن تە:
+1. هەمیشە تنێ ب زمانێ کوردی یێ بەهدینی یێ پاقژ، شیرین و سادە ئاخڤە (چ دەمێ سۆرانی یان زمانێن دی بکار نەئینە).
+2. شێوازێ ئاخڤتنا تە وەکێ برا و هەڤالەکی بێ؛ دوور بە ژ پێشەکیێن درێژ، گرێدایی یان ئەکادیمیێن توند. ڕاستەوخۆ بچە سەر مەرەمێ.
+3. بەرسڤێن تە باوەرپێکری، ڕوون، ب کورتی و ب شێوازەکێ چاتی یێ نەرم و جوان بن.
+4. ئەگەر پرسیار لە سەر تشتێن تەندروستی یان نوژداری بوو، زانیاریێن پێدڤی بدە، لێ بێخە بیرا بکارئینەری کو ئەڤە تنێ بۆ زانین و ڤەکۆلینێ یە.
 """
 
 def check_password():
@@ -72,8 +76,18 @@ def main():
 
     client = Groq(api_key=api_key)
 
-    # مۆدێلا نوی و کارا یا گرۆقێ
     selected_model = "llama-3.3-70b-versatile"
+    try:
+        models = client.models.list()
+        model_ids = [m.id for m in models.data]
+        if "llama-3.3-70b-versatile" in model_ids:
+            selected_model = "llama-3.3-70b-versatile"
+        elif "llama-3.1-8b-instant" in model_ids:
+            selected_model = "llama-3.1-8b-instant"
+        elif len(model_ids) > 0:
+            selected_model = model_ids[0]
+    except:
+        pass
 
     with st.sidebar:
         st.write("🔒 **ئەوڵەکاری**")
@@ -81,6 +95,7 @@ def main():
             st.session_state.authenticated = False
             st.rerun()
 
+    # نیشاندانا مێژووا چاتی دگەل اڤاتارێن گوهۆڕی
     for msg in st.session_state.messages:
         if msg["role"] != "system":
             avatar_icon = "⭐" if msg["role"] == "assistant" else "👤"
