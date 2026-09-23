@@ -24,7 +24,7 @@ st.markdown("""
 DEFAULT_MODEL = "llama3-70b-8192"
 APP_PASSWORD = "200000"
 
-# کلیلا نوو ڕاستەوخۆ ل ڤێرە هاتییە دانان
+# کلیلا تە یا تەمام و ڕاستڤەکری ل ڤێرە هاتییە دانان
 GROQ_API_KEY = "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"
 
 SYSTEM_PROMPT = """
