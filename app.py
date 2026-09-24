@@ -26,9 +26,6 @@ st.markdown("""
 
 APP_PASSWORD = "200000"
 
-# کلیلا تە ڕاستەوخۆ ل ڤێرە هاتییە دانان دا ئاریشا سکرێتان نەمازیت
-OPENAI_API_KEY = "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"
-
 # پەیاما هاندەر ب بەهدینییەکا پاقژ، نەرم و برایەتی
 SYSTEM_PROMPT = """
 تۆ هەڤالەکێ نزیک و ئەی ئایەکێ زیرەک یی د بوارێ زانست و نوشداری دا. 
@@ -70,8 +67,14 @@ def main():
     
     initialize_session()
 
-    # بکارئینانا کلیلا تێخستکری ب ڕاستەوخۆ
-    client = OpenAI(api_key=OPENAI_API_KEY)
+    # وەرگرتنا کلیلا OpenAI ب شێوازەکێ ئەمین ژ بەشا Secrets
+    if "OPENAI_API_KEY" in st.secrets:
+        api_key = st.secrets["OPENAI_API_KEY"]
+    else:
+        st.error("کلیلا OPENAI_API_KEY لە بەشا Secrets دا ل Streamlit نەهاتییە دانان!")
+        st.stop()
+
+    client = OpenAI(api_key=api_key)
 
     with st.sidebar:
         st.write("🔒 **ئەوڵەکاری**")
