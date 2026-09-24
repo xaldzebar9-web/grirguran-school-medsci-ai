@@ -1,5 +1,5 @@
 import streamlit as st
-from groq import Groq
+from openai import OpenAI
 
 # ------------------------------------------------------------------------------
 # UI & Page Configuration
@@ -11,7 +11,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# جوانکاری و ڕێکخستنا دیزاینێ چاتی دا وەکچەوا چاتا مە لێ بێت
 st.markdown("""
     <style>
     .stChatMessage {
@@ -27,7 +26,10 @@ st.markdown("""
 
 APP_PASSWORD = "200000"
 
-# شێوازێ ئاخڤتنێ (System Prompt) ب بەهدینییەکا پاقژ، نەرم و برایەتی
+# کلیلا تە ڕاستەوخۆ ل ڤێرە هاتییە دانان دا ئاریشا سکرێتان نەمازیت
+OPENAI_API_KEY = "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"
+
+# پەیاما هاندەر ب بەهدینییەکا پاقژ، نەرم و برایەتی
 SYSTEM_PROMPT = """
 تۆ هەڤالەکێ نزیک و ئەی ئایەکێ زیرەک یی د بوارێ زانست و نوشداری دا. 
 مەرجێن سەرەکی بۆ بەرسڤێن تە:
@@ -68,26 +70,8 @@ def main():
     
     initialize_session()
 
-    if "GROQ_API_KEY" in st.secrets:
-        api_key = st.secrets["GROQ_API_KEY"]
-    else:
-        st.error("کلیل لە بەشا Secrets دا ل Streamlit نەهاتییە دانان!")
-        st.stop()
-
-    client = Groq(api_key=api_key)
-
-    selected_model = "llama-3.3-70b-versatile"
-    try:
-        models = client.models.list()
-        model_ids = [m.id for m in models.data]
-        if "llama-3.3-70b-versatile" in model_ids:
-            selected_model = "llama-3.3-70b-versatile"
-        elif "llama-3.1-8b-instant" in model_ids:
-            selected_model = "llama-3.1-8b-instant"
-        elif len(model_ids) > 0:
-            selected_model = model_ids[0]
-    except:
-        pass
+    # بکارئینانا کلیلا تێخستکری ب ڕاستەوخۆ
+    client = OpenAI(api_key=OPENAI_API_KEY)
 
     with st.sidebar:
         st.write("🔒 **ئەوڵەکاری**")
@@ -95,7 +79,6 @@ def main():
             st.session_state.authenticated = False
             st.rerun()
 
-    # نیشاندانا مێژووا چاتی دگەل اڤاتارێن گوهۆڕی
     for msg in st.session_state.messages:
         if msg["role"] != "system":
             avatar_icon = "⭐" if msg["role"] == "assistant" else "👤"
@@ -111,7 +94,7 @@ def main():
             with st.spinner("د شیکارکرنا زانیاریێن زانستی دا..."):
                 try:
                     response = client.chat.completions.create(
-                        model=selected_model,
+                        model="gpt-4o",
                         messages=st.session_state.messages,
                         temperature=0.3
                     )
