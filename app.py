@@ -60,15 +60,17 @@ def initialize_session():
 def main():
     check_password()
 
-    # دانانا لوگو و ناڤێ قوتابخانێ ل سایدبارێ (ب ناڤێ logo.png.jpg)
+    # دانانا لوگو و ناڤێ قوتابخانێ ل سایدبارێ (ب شێوازێ خویندنا بایتان دا کێشا ناڤی نەبیت)
     with st.sidebar:
-        try:
-            st.image("logo.png.jpg", use_container_width=True)
-        except:
+        logo_loaded = False
+        for img_name in ["logo.png.jpg", "logo.png", "Logo.png", "LOGO.png"]:
             try:
-                st.image("logo.png", use_container_width=True)
+                with open(img_name, "rb") as f:
+                    st.image(f.read(), use_container_width=True)
+                    logo_loaded = True
+                    break
             except:
-                pass
+                continue
         
         st.markdown("<h4 style='text-align: center;'>ئامادەیا گرگوران یا تێکەڵ</h4>", unsafe_allow_html=True)
         st.divider()
