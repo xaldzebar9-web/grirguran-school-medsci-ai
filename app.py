@@ -1,5 +1,5 @@
 import streamlit as st
-from openai import OpenAI
+import google.generativeai as genai
 
 # ------------------------------------------------------------------------------
 # UI & Page Configuration
@@ -55,26 +55,36 @@ def check_password():
 
 def initialize_session():
     if "messages" not in st.session_state:
-        st.session_state.messages = [
-            {"role": "system", "content": SYSTEM_PROMPT}
-        ]
+        # بۆ Gemini سیستم پرۆمپتی ل دەستپێکێ وەک دستور دەینە
+        st.session_state.messages = []
 
 def main():
     check_password()
     
     st.title("🧬 MedSci AI Agent")
-    st.caption("سیستەمێ زیرەکیا دەستکرد بۆ ڤەکۆلینێن زانستی و نوشداری")
+    st.caption("سیستەمێ زیرەکیا دەستکرد بۆ ڤەکۆلینێن زانستی و نوشداری (Gemini)")
     
     initialize_session()
 
-    # وەرگرتنا کلیلا OpenAI ب شێوازەکێ ئەمین ژ بەشا Secrets
-    if "OPENAI_API_KEY" in st.secrets:
-        api_key = st.secrets["OPENAI_API_KEY"]
+    # وەرگرتنا کلیلا Gemini ب شێوازەکێ ئەمین ژ بەشا Secrets
+    if "GEMINI_API_KEY" in st.secrets:
+        gemini_key = st.secrets["GEMINI_API_KEY"]
     else:
-        st.error("کلیلا OPENAI_API_KEY لە بەشا Secrets دا ل Streamlit نەهاتییە دانان!")
+        st.error("کلیلا GEMINI_API_KEY لە بەشا Secrets دا ل Streamlit نەهاتییە دانان!")
         st.stop()
 
-    client = OpenAI(api_key=api_key)
+    genai.configure(api_key=gemini_key)
+    
+    # ئامادەکرنا مۆدێلێ ب System Instruction
+    generation_config = {
+        "temperature": 0.3,
+    }
+    
+    model = genai.GenerativeModel(
+        model_name="gemini-2.5-flash",
+        generation_config=generation_config,
+        system_instruction=SYSTEM_PROMPT
+    )
 
     with st.sidebar:
         st.write("🔒 **ئەوڵەکاری**")
@@ -82,28 +92,28 @@ def main():
             st.session_state.authenticated = False
             st.rerun()
 
-    for msg in st.session_state.messages:
-        if msg["role"] != "system":
-            avatar_icon = "⭐" if msg["role"] == "assistant" else "👤"
-            with st.chat_message(msg["role"], avatar=avatar_icon):
-                st.write(msg["content"])
+    # نیشاندانا مێژووا چاتێ
+    for message in st.session_state.messages:
+        avatar_icon = "⭐" if message["role"] == "model" else "👤"
+        role_to_show = "assistant" if message["role"] == "model" else "user"
+        with st.chat_message(role_to_show, avatar=avatar_icon):
+            st.write(message["parts"][0])
 
     if user_query := st.chat_input("پرسیارا خۆ یا زانستی یان نوشداری بنڤێسە..."):
-        st.session_state.messages.append({"role": "user", "content": user_query})
+        st.session_state.messages.append({"role": "user", "parts": [user_query]})
         with st.chat_message("user", avatar="👤"):
             st.write(user_query)
 
         with st.chat_message("assistant", avatar="⭐"):
             with st.spinner("د شیکارکرنا زانیاریێن زانستی دا..."):
                 try:
-                    response = client.chat.completions.create(
-                        model="gpt-4o",
-                        messages=st.session_state.messages,
-                        temperature=0.3
-                    )
-                    bot_reply = response.choices[0].message.content
+                    # دروستکرنا چاتێ ب مێژووا بەری نوکە
+                    chat = model.start_chat(history=st.session_state.messages[:-1])
+                    response = chat.send_message(user_query)
+                    bot_reply = response.text
+                    
                     st.write(bot_reply)
-                    st.session_state.messages.append({"role": "assistant", "content": bot_reply})
+                    st.session_state.messages.append({"role": "model", "parts": [bot_reply]})
                 except Exception as e:
                     st.error(f"خەلەتیەک ڕوودا: {str(e)}")
 
