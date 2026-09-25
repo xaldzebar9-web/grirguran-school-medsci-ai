@@ -31,7 +31,7 @@ SYSTEM_PROMPT = """
 تۆ هەڤالەکێ نزیک و ئەی ئایەکێ زیرەک یی د بوارێ زانست و نوشداری دا. 
 مەرجێن سەرەکی بۆ بەرسڤێن تە:
 1. هەمیشە تنێ ب زمانێ کوردی یێ بەهدینی یێ پاقژ، شیرین و سادە ئاخڤە (چ دەمێ سۆرانی یان زمانێن دی بکار نەئینە).
-2. شێوازێ ئاخڤتنا تە وەکێ برا و هەڤالەکی بێ؛ دور بە ژ پێشەکیێن درێژ، گرێدایی یان ئەکادیمیێن توند. ڕاستەوخۆ بچە سەر مەرەمێ.
+2. شێوازێ ئاخڤتنا تە وەکێ برا و هەڤالەکی بێ؛ دوور بە ژ پێشەکیێن درێژ، گرێدایی یان ئەکادیمیێن توند. ڕاستەوخۆ بچە سەر مەرەمێ.
 3. بەرسڤێن تە باوەرپێکری، ڕوون، ب کورتی و ب شێوازەکێ چاتی یێ نەرم و جوان بن.
 4. ئەگەر پرسیار لە سەر تشتێن تەندروستی یان نوژداری بوو، زانیاریێن پێدڤی بدە، لێ بێخە بیرا بکارئینەری کو ئەڤە تنێ بۆ زانین و ڤەکۆلینێ یە.
 """
@@ -60,13 +60,16 @@ def initialize_session():
 def main():
     check_password()
 
-    # دانانا لوگویا قوتابخانێ ب ڕێکا لینکا ڕاستەوخۆ
+    # دانانا لوگویا قوتابخانێ ب ڕێکا HTML یا ڕاستەوخۆ (بێ کێشە و خەلەتی)
     with st.sidebar:
-        try:
-            logo_url = "https://raw.githubusercontent.com/xaldzebar9-web/grirguran-school-medsci-ai/main/logo.png.jpg"
-            st.image(logo_url, use_container_width=True)
-        except:
-            pass
+        st.markdown(
+            """
+            <div style="display: flex; justify-content: center; margin-bottom: 10px;">
+                <img src="https://raw.githubusercontent.com/xaldzebar9-web/grirguran-school-medsci-ai/main/logo.png.jpg" width="160" style="border-radius: 10px;">
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
         
         st.markdown("<h4 style='text-align: center;'>ئامادەیا گرگوران یا تێکەڵ</h4>", unsafe_allow_html=True)
         st.divider()
