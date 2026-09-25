@@ -5,7 +5,7 @@ import google.generativeai as genai
 # UI & Page Configuration
 # ------------------------------------------------------------------------------
 st.set_page_config(
-    page_title="MedSci AI - سەکۆیا زانستی و نوشداری",
+    page_title="ئامادەیا گرگوران - MedSci AI",
     page_icon="🧬",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -42,7 +42,7 @@ def check_password():
 
     if not st.session_state.authenticated:
         st.title("🔒 چوونە ژوور ب پاسۆردێ")
-        st.caption("ژ بۆ بکارئینانا MedSci AI، تکایە پاسۆردێ بنڤێسە.")
+        st.caption("ژ بۆ بکارئینانا سیستەمی، تکایە پاسۆردێ بنڤێسە.")
         
         pwd_input = st.text_input("پاسۆرد (Password):", type="password")
         if st.button("چوونە ژوور"):
@@ -55,14 +55,28 @@ def check_password():
 
 def initialize_session():
     if "messages" not in st.session_state:
-        # بۆ Gemini سیستم پرۆمپتی ل دەستپێکێ وەک دستور دەینە
         st.session_state.messages = []
 
 def main():
     check_password()
+
+    # دانانا لوگو و ناڤێ قوتابخانێ ل سایدبارێ (ب ناڤێ نوو یێ وێنەی)
+    with st.sidebar:
+        try:
+            st.image("logo.png.jpg", use_container_width=True)
+        except:
+            pass # هەکە فایلا وێنەی نەهاتە دیتن، بێ کێشە درێژە پێ بدە
+        
+        st.markdown("<h4 style='text-align: center;'>ئامادەیا گرگوران یا تێکەڵ</h4>", unsafe_allow_html=True)
+        st.divider()
+        
+        st.write("🔒 **ئەوڵەکاری**")
+        if st.button("دەركەفتن (Logout)"):
+            st.session_state.authenticated = False
+            st.rerun()
     
     st.title("🧬 MedSci AI Agent")
-    st.caption("سیستەمێ زیرەکیا دەستکرد بۆ ڤەکۆلینێن زانستی و نوشداری (Gemini)")
+    st.caption("سیستەمێ زیرەکیا دەستکرد بۆ ڤەکۆلینێن زانستی و نوشداری")
     
     initialize_session()
 
@@ -75,22 +89,15 @@ def main():
 
     genai.configure(api_key=gemini_key)
     
-    # ئامادەکرنا مۆدێلێ ب System Instruction
     generation_config = {
         "temperature": 0.3,
     }
     
     model = genai.GenerativeModel(
-        model_name="gemini-3.6-flash",
+        model_name="gemini-2.5-flash",
         generation_config=generation_config,
         system_instruction=SYSTEM_PROMPT
     )
-
-    with st.sidebar:
-        st.write("🔒 **ئەوڵەکاری**")
-        if st.button("دەركەفتن (Logout)"):
-            st.session_state.authenticated = False
-            st.rerun()
 
     # نیشاندانا مێژووا چاتێ
     for message in st.session_state.messages:
@@ -107,7 +114,6 @@ def main():
         with st.chat_message("assistant", avatar="⭐"):
             with st.spinner("د شیکارکرنا زانیاریێن زانستی دا..."):
                 try:
-                    # دروستکرنا چاتێ ب مێژووا بەری نوکە
                     chat = model.start_chat(history=st.session_state.messages[:-1])
                     response = chat.send_message(user_query)
                     bot_reply = response.text
