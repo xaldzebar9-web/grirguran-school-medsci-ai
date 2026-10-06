@@ -21,7 +21,21 @@ st.markdown("""
     div[data-testid="stChatInput"] {
         border-radius: 12px;
     }
+    /* دابینکرنا ڕەنگێ زێڕین و سپی بۆ نڤیسارا خەلیل ل گۆشەیا سەرێ پەرەی */
+    .developer-badge {
+        position: absolute;
+        top: 15px;
+        left: 20px;
+        font-size: 14px;
+        font-weight: bold;
+        background: linear-gradient(135deg, #FFD700 0%, #FFFFFF 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0px 1px 2px rgba(0,0,0,0.3);
+        z-index: 999;
+    }
     </style>
+    <div class="developer-badge">khalid.developer@</div>
 """, unsafe_allow_html=True)
 
 APP_PASSWORD = "200000"
@@ -97,8 +111,9 @@ def main():
         "temperature": 0.3,
     }
     
+    # گۆڕینا مۆدێلی بۆ gemini-2.5-flash دا سنورێ 429 چ جاران نەهێت و زووتری کار بکەت
     model = genai.GenerativeModel(
-        model_name="gemini-3.6-flash",
+        model_name="gemini-2.5-flash",
         generation_config=generation_config,
         system_instruction=SYSTEM_PROMPT
     )
@@ -110,6 +125,7 @@ def main():
         with st.chat_message(role_to_show, avatar=avatar_icon):
             st.write(message["parts"][0])
 
+    # st.chat_input ل سەر ئایفۆن و کیبۆردان ب دووگما ئینتەرێ ڤرێکرنێ دکت (Enter / Return)
     if user_query := st.chat_input("پرسیارا خۆ یا زانستی یان نوشداری بنڤێسە..."):
         st.session_state.messages.append({"role": "user", "parts": [user_query]})
         with st.chat_message("user", avatar="👤"):
