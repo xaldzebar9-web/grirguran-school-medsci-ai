@@ -111,9 +111,9 @@ def main():
         "temperature": 0.3,
     }
     
-    # گۆڕینا مۆدێلی بۆ gemini-3.6-flash ل گوورەی خواستا نوویا گوگڵ
+    # گۆڕینا مۆدێلی بۆ gemini-1.5-flash بۆ پاراستنا سەقامگیریێ و دوورکەفتن ژ لیمیتێ
     model = genai.GenerativeModel(
-        model_name="gemini-3.6-flash",
+        model_name="gemini-1.5-flash",
         generation_config=generation_config,
         system_instruction=SYSTEM_PROMPT
     )
