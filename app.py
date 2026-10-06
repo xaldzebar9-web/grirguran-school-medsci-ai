@@ -21,6 +21,7 @@ st.markdown("""
     div[data-testid="stChatInput"] {
         border-radius: 12px;
     }
+    /* دابینکرنا ڕەنگێ زێڕین و سپی بۆ نڤیسارا خەلیل ل گۆشەیا سەرێ پەرەی */
     .developer-badge {
         position: absolute;
         top: 15px;
@@ -39,6 +40,7 @@ st.markdown("""
 
 APP_PASSWORD = "200000"
 
+# پەیاما هاندەر ب بەهدینییەکا پاقژ، نەرم و برایەتی
 SYSTEM_PROMPT = """
 تۆ هەڤالەکێ نزیک و ئەی ئایەکێ زیرەک یی د بوارێ زانست و نوشداری دا. 
 مەرجێن سەرەکی بۆ بەرسڤێن تە:
@@ -72,6 +74,7 @@ def initialize_session():
 def main():
     check_password()
 
+    # دانانا لوگویا قوتابخانێ ب ڕێکا HTML یا ڕاستەوخۆ
     with st.sidebar:
         st.markdown(
             """
@@ -95,6 +98,7 @@ def main():
     
     initialize_session()
 
+    # وەرگرتنا کلیلا Gemini ژ بەشا Secrets
     if "GEMINI_API_KEY" in st.secrets:
         gemini_key = st.secrets["GEMINI_API_KEY"]
     else:
@@ -107,29 +111,14 @@ def main():
         "temperature": 0.3,
     }
     
-    # --------------------------------------------------------------------------
-    # دۆزینەوەیا ئۆتۆماتیکی یا مۆدێلێ بەردەست ژ بۆ ڕێگریکرن ژ خەلەتیێن 404
-    # --------------------------------------------------------------------------
-    selected_model_name = None
-    try:
-        available_models = [
-            m.name for m in genai.list_models() 
-            if 'generateContent' in m.supported_generation_methods
-        ]
-        if available_models:
-            selected_model_name = available_models[0]
-    except Exception:
-        pass
-
-    if not selected_model_name:
-        selected_model_name = "gemini-1.5-flash"
-
+    # بەکارئینانا مۆدێلێ فەرمی gemini-3.8-flash
     model = genai.GenerativeModel(
-        model_name=selected_model_name,
+        model_name="gemini-3.8-flash",
         generation_config=generation_config,
         system_instruction=SYSTEM_PROMPT
     )
 
+    # نیشاندانا مێژووا چاتێ
     for message in st.session_state.messages:
         avatar_icon = "⭐" if message["role"] == "model" else "👤"
         role_to_show = "assistant" if message["role"] == "model" else "user"
