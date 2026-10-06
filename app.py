@@ -107,9 +107,9 @@ def main():
         "temperature": 0.3,
     }
     
-    # استفاده از مدل کاملاً پایدار و تضمین‌شده برای جلوگیری از خطای 404
+    # بەکارئینانا مۆدێلێ بنەڕەتی بۆ ڕێگریکرن ژ خەلەتیا 404
     model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash",
+        model_name="gemini-pro",
         generation_config=generation_config,
         system_instruction=SYSTEM_PROMPT
     )
