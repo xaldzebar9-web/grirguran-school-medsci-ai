@@ -21,7 +21,6 @@ st.markdown("""
     div[data-testid="stChatInput"] {
         border-radius: 12px;
     }
-    /* دابینکرنا ڕەنگێ زێڕین و سپی بۆ نڤیسارا خەلیل ل گۆشەیا سەرێ پەرەی */
     .developer-badge {
         position: absolute;
         top: 15px;
@@ -40,7 +39,6 @@ st.markdown("""
 
 APP_PASSWORD = "200000"
 
-# پەیاما هاندەر ب بەهدینییەکا پاقژ، نەرم و برایەتی
 SYSTEM_PROMPT = """
 تۆ هەڤالەکێ نزیک و ئەی ئایەکێ زیرەک یی د بوارێ زانست و نوشداری دا. 
 مەرجێن سەرەکی بۆ بەرسڤێن تە:
@@ -74,7 +72,6 @@ def initialize_session():
 def main():
     check_password()
 
-    # دانانا لوگویا قوتابخانێ ب ڕێکا HTML یا ڕاستەوخۆ (بێ کێشە و خەلەتی)
     with st.sidebar:
         st.markdown(
             """
@@ -98,7 +95,6 @@ def main():
     
     initialize_session()
 
-    # وەرگرتنا کلیلا Gemini ب شێوازەکێ ئەمین ژ بەشا Secrets
     if "GEMINI_API_KEY" in st.secrets:
         gemini_key = st.secrets["GEMINI_API_KEY"]
     else:
@@ -111,14 +107,13 @@ def main():
         "temperature": 0.3,
     }
     
-    # گۆڕینا مۆدێلی بۆ gemini-1.5-flash بۆ پاراستنا سەقامگیریێ و دوورکەفتن ژ لیمیتێ
+    # بەکارئینانا مۆدێلێ گشتی یێ فلاش کو بێ کێشە هاتییە ناساندن
     model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash",
+        model_name="gemini-flash",
         generation_config=generation_config,
         system_instruction=SYSTEM_PROMPT
     )
 
-    # نیشاندانا مێژووا چاتێ
     for message in st.session_state.messages:
         avatar_icon = "⭐" if message["role"] == "model" else "👤"
         role_to_show = "assistant" if message["role"] == "model" else "user"
