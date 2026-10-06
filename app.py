@@ -107,9 +107,25 @@ def main():
         "temperature": 0.3,
     }
     
-    # بەکارئینانا مۆدێلێ بنەڕەتی بۆ ڕێگریکرن ژ خەلەتیا 404
+    # --------------------------------------------------------------------------
+    # دۆزینەوەیا ئۆتۆماتیکی یا مۆدێلێ بەردەست ژ بۆ ڕێگریکرن ژ خەلەتیێن 404
+    # --------------------------------------------------------------------------
+    selected_model_name = None
+    try:
+        available_models = [
+            m.name for m in genai.list_models() 
+            if 'generateContent' in m.supported_generation_methods
+        ]
+        if available_models:
+            selected_model_name = available_models[0]
+    except Exception:
+        pass
+
+    if not selected_model_name:
+        selected_model_name = "gemini-1.5-flash"
+
     model = genai.GenerativeModel(
-        model_name="gemini-pro",
+        model_name=selected_model_name,
         generation_config=generation_config,
         system_instruction=SYSTEM_PROMPT
     )
